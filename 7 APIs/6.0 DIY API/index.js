@@ -17,22 +17,62 @@ app.get("/random", (req, res) => {
 //2. GET a specific joke
 app.get("/jokes/:id", (req, res) => {
   let id = parseInt(req.params.id);
-  try {
-    res.json(jokes[id]);
-  } catch (e) {
-    res.send(e);
+  let foundJoke = jokes.find((joke) => joke.id == id);
+  if (foundJoke) {
+    res.json(foundJoke);
+  } else {
+    res.send("Joke not found");
   }
 });
 //3. GET a jokes by filtering on the joke type
-app.get("/jokes", (req, res) => {
+app.get("/filter", (req, res) => {
   let type = req.query.type;
+  var filteredJokes = [];
+  for (let joke of jokes) {
+    if (joke.jokeType == type) {
+      filteredJokes.push(joke);
+    }
+  }
+  res.json(filteredJokes);
 });
 
 //4. POST a new joke
+app.post("/jokes", (req, res) => {
+  let type = req.body.type;
+  let text = req.body.text;
+  let jokeId = jokes.length + 1;
+  let newJoke = { id: jokeId, jokeText: text, jokeType: type };
+  jokes.push(newJoke);
+  console.log(jokes.slice(-1));
+  res.json(newJoke);
+});
 
 //5. PUT a joke
-
+app.put("/jokes/:id", (req, res) => {
+  let jokeID = parseInt(req.params.id);
+  let newJoke = {
+    id: jokeID,
+    jokeText: req.body.text,
+    jokeType: req.body.type,
+  };
+  let index = jokes.findIndex((joke) => joke.id === jokeID);
+  jokes[index] = newJoke;
+  console.log(newJoke);
+  res.json(jokes[index]);
+});
 //6. PATCH a joke
+app.patch("/jokes/:id", (req, res) => {
+  let jokeID = parseInt(req.params.id);
+  let index = jokes.findIndex((joke) => joke.id === jokeID);
+  let newJoke = {
+    id: jokeID,
+    jokeText: req.body.text || jokes[index].jokeText,
+    jokeType: req.body.type || jokes[index].jokeType,
+  };
+  jokes[index] = newJoke;
+  console.log(jokes[index]);
+  res.json(jokes[index]);
+});
 
 //7. DELETE Specific joke
 
