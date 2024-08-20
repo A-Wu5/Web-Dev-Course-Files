@@ -75,8 +75,24 @@ app.patch("/jokes/:id", (req, res) => {
 });
 
 //7. DELETE Specific joke
+app.delete("/joke/:id", (req, res) => {
+  let jokeID = parseInt(req.params.id);
+  let index = jokes.findIndex((joke) => joke.id === jokeID);
+  if (index > -1) {
+    jokes.splice(index, 1); // Removes 1 element from jokes starting at index
+    res.sendStatus(200);
+  } else {
+    res.status(404).json({
+      error: `Joke with id ${jokeID} not found. No jokes were deleted.`,
+    });
+  }
+});
 
 //8. DELETE All jokes
+app.delete("/jokes/all", (req, res) => {
+  jokes = [];
+  res.sendStatus(200);
+});
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
